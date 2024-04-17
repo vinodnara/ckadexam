@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dapi-envars-fieldref
+  namespace: my-ns
+spec:
+  containers:
+    - name: test-container
+      image: registry.k8s.io/busybox
+      command: [ "sh", "-c"]
+      args:
+      - while true; do
+          sleep 10;
+        done;
+      env:
+        - name: MY_NODE_NAME      # pod name = metadata.name, ns = metadata.namespace, ip = status.podIP, servacc = spec.serviceAccountName
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: DEMO_GREETING    # direct value assignment
+          value: "Hello from the environment"
+        - name: PLAYER_INITIAL_LIVES # Notice that the case is different here
+                                     # from the key name in the ConfigMap.
+          valueFrom:
+            configMapKeyRef:
+              name: game-demo           # The ConfigMap this value comes from.
+              key: player_initial_lives # The key to fetch.
+      volumeMounts:
+      - name: foo    # secret as a volume
+        mountPath: "/etc/foo"
+        readOnly: true
+      - name: config
+        mountPath: "/config"
+        readOnly: true
+  volumes: # You set volumes at the Pod level, then mount them into containers inside that Pod
+  - name: config
+    configMap:
+      name: game-demo     # Provide the name of the ConfigMap you want to mount.
+      items:   # keys from the ConfigMap to create as files, remove to include all
+      - key: "game.properties"
+        path: "game.properties"
+      - key: "user-interface.properties"
+        path: "user-interface.properties"
+    - name: foo   # secret as a volume
+      secret:
+        secretName: mysecret
+        optional: true      
+  restartPolicy: Never
