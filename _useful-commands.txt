@@ -1,0 +1,12 @@
+# get a token of a service account from a secret and decode it
+
+kubectl get secrets -n default serviceaccount-secret -o jsonpath={.data.token} | base64 --decode
+
+
+## Helm
+source <(helm completion bash)
+helm list -A -a # all states, all namespaces
+helm show values bitnami/apache | less -X
+helm install -n my-namespace release-names chart/name --set replicaCount=2
+
+
