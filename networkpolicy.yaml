@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: policy #  RENAME_ME_policy
+  namespace: my-ns #RENAME_ME_my-ns
+spec:
+  podSelector: #  {} to apply to all in NS
+    matchLabels:
+      app: wheretoapply
+  policyTypes:	
+  - Ingress
+  - Egress
+  ingress:
+    - from:		# allow all from the outside incoming on ports 80/443
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 80
+        - port: 443
+    - from:		# all pods  in my namespace
+        - podSelector: {}
+    - from:   # all from all NS in cluster
+        - namespaceSelector: {}
+    - from:   # all from a namespace = myns
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: myns
+  egress:
+    - to:
+        - namespaceSelector:  # only selected pods in selected NS
+            matchLabels:
+              kubernetes.io/metadata.name: myns
+          podSelector:
+            matchLabels:
+              app: app1
+    - to:									    # sected pods in my NS only
+        - podSelector:
+            matchLabels:
+              app: to_app
+    - to:                     # selected pods in any NS
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              k8s-app: kube-dns
+    - ports:      # allow traffic to DNS
+        - port: 53
+
