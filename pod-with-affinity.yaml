@@ -4,7 +4,7 @@ metadata:
   name: nginx
 spec:
   affinity:
-    nodeAffinity:
+    nodeAffinity:   # to match node labels
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
         - matchExpressions:
@@ -12,7 +12,7 @@ spec:
             operator: In
             values:
             - ssd            
-    nodeAffinity:
+    nodeAffinity:   # to match node labels
       preferredDuringSchedulingIgnoredDuringExecution:
       - weight: 1
         preference:
@@ -21,6 +21,28 @@ spec:
             operator: In
             values:
             - ssd
+      # to schedule to the node where pod app=web-store doesn't run
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+            - key: app
+              operator: In
+              values:
+              - web-store
+          topologyKey: "kubernetes.io/hostname"
+      # to prefer to chedule to the node where pod security=S2 runs
+      podAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+              - key: security
+                operator: In
+                values:
+                - S2
+            topologyKey: topology.kubernetes.io/zone          
   tolerations: # kubectl taint nodes node1 key1=value1:NoSchedule
   - key: "key1"
     operator: "Equal"
