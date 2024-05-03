@@ -1,12 +1,21 @@
-# get a token of a service account from a secret and decode it
 
-kubectl get secrets -n default serviceaccount-secret -o jsonpath={.data.token} | base64 --decode
-
-
-## Helm
+### Helm
 source <(helm completion bash)
 helm list -A -a # all states, all namespaces
 helm show values bitnami/apache | less -X
 helm install -n my-namespace release-names chart/name --set replicaCount=2
 
 
+### RBAC
+# get a token of a service account from a secret and decode it
+kubectl get secrets -n default serviceaccount-secret -o jsonpath={.data.token} | base64 --decode
+
+# Role + RoleBinding (available in single Namespace, applied in single Namespace)
+# ClusterRole + ClusterRoleBinding (available cluster-wide, applied cluster-wide)
+# ClusterRole + RoleBinding (available cluster-wide, applied in single Namespace)
+kubectl create serviceaccount pipeline -n ns1  
+kubectl create clusterrolebinding pipeline --clusterrole view --serviceaccount ns1:pipeline
+#
+kubectl create clusterrole deployment-mgr --verb create,delete --resource deployments
+kubectl -n ns1 create rolebinding pipeline-deployment-manager --clusterrole deployment-mgr  --serviceaccount ns1:pipeline
+kubectl -n ns2 create rolebinding pipeline-deployment-manager --clusterrole deployment-mgr  --serviceaccount ns2:pipeline
