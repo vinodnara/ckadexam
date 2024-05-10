@@ -19,3 +19,5 @@ kubectl create clusterrolebinding pipeline --clusterrole view --serviceaccount n
 kubectl create clusterrole deployment-mgr --verb create,delete --resource deployments
 kubectl -n ns1 create rolebinding pipeline-deployment-manager --clusterrole deployment-mgr  --serviceaccount ns1:pipeline
 kubectl -n ns2 create rolebinding pipeline-deployment-manager --clusterrole deployment-mgr  --serviceaccount ns2:pipeline
+#
+kubectl auth can-i get configmap -n ns1 --as system:serviceaccount:ns1:pipeline
