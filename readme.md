@@ -1,4 +1,4 @@
 XML blanks taken from kubernetes.io or prepared to be used on CKA and CKAD exams.
 
-When you are in the exam environment, you chave documentation available and you can look up there.
-Alternatively, you can clone this repo (it is tested, it works) and get all the templatest immediately at one place.
+CKA/CKAD are open book exams running in a special environment. You can look up stuff on kubernetes.io website, but it takes time.
+You can clone this repo and get all the necessary templates at one place.
